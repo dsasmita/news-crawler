@@ -108,3 +108,4 @@ venv.bak/
 # settings
 settings.py
 migrations/env.py
+alembic.ini
