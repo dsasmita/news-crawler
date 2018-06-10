@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 from flask import Flask
 
 from module.crawler_news.model_crawler import db_crawler
 from module.crawler_news.view import module_crawler_news
 from module.home.view import module_home
-
 
 def create_app():
     app = Flask(__name__)

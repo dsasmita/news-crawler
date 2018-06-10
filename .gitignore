@@ -105,4 +105,6 @@ venv.bak/
 
 .idea
 
+# settings
 settings.py
+migrations/env.py
