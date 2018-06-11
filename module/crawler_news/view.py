@@ -97,6 +97,12 @@ def kompas_category():
 
 @module_crawler_news.route('kompas/detail')
 def kompas_detail():
+    check_kompas = Portal.query.filter_by(title='kompas.com').count()
+    if check_kompas == 0:
+        return 'news portal kompas not added yet'
+
+    portal = Portal.query.filter_by(title='kompas.com').first()
+
     limit = request.args.get('limit', 20)
 
     print('start ....')
@@ -105,7 +111,8 @@ def kompas_detail():
     print('......')
     print('......')
 
-    news_posts = NewsPost.query.filter_by(scrap_status=False).order_by(NewsPost.id.asc()).limit(limit).all()
+    news_posts = NewsPost.query.filter_by(scrap_status=False, id_portal=portal.id ).\
+                    order_by(NewsPost.id.asc()).limit(limit).all()
 
     kompas = KompasCrawler()
 
@@ -200,6 +207,7 @@ def detik_scrap_list():
             news.link_news = link['href']
             news.id_portal = portal.id
             news.title = link['title']
+            news.title_sub = link['title_sub']
             news.kanal_index = link['kanal']
             news.date_publish = link['date']
 

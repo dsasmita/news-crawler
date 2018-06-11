@@ -55,9 +55,8 @@ class DetikCrawler:
     def generate_link(self, link_list):
         news_link = []
         for lk in link_list:
-            url_pagination = self.generate_index(lk)
-
             if lk['kanal'] == 'detikNews':
+                url_pagination = self.generate_index(lk)
                 for url in url_pagination:
                     content = requests.get(url['link'], timeout=10)
                     bs = bs4.BeautifulSoup(content.text, "html.parser")
@@ -69,6 +68,10 @@ class DetikCrawler:
                             tmp['href'] = link.find('a')['href']
                             tmp['title'] = link.find('h2').get_text().strip()
                             tmp['kanal'] = lk['kanal']
+                            tmp['title_sub'] = ''
+                            title_sub = link.find('span', 'sub_judul')
+                            if title_sub != None:
+                                tmp['title_sub'] = title_sub.get_text().strip()
 
                             # date
                             date = link.find('span', 'labdate').get_text().strip()
@@ -79,6 +82,168 @@ class DetikCrawler:
 
                     content.close()
                     bs.decompose()
+
+            if lk['kanal'] == 'detikFinance':
+                content = requests.get(lk['link'], timeout=10)
+                bs = bs4.BeautifulSoup(content.text, "html.parser")
+
+                list_array = bs.find('div', 'lf_content')
+
+                if list_array != None:
+                    for link in list_array.select('article'):
+                        tmp = {}
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('h2').get_text().strip()
+                        tmp['kanal'] = lk['kanal']
+                        tmp['title_sub'] = ''
+                        title_sub = link.find('span', 'sub_judul')
+                        if title_sub != None:
+                            tmp['title_sub'] = title_sub.get_text().strip()
+
+                        # date
+                        date = link.find('span', 'labdate').get_text().strip()
+                        date = self.date_format_en(date)
+
+                        tmp['date'] = date
+                        news_link.append(tmp)
+
+                content.close()
+                bs.decompose()
+
+            if lk['kanal'] == 'detiki-Net':
+                content = requests.get(lk['link'], timeout=10)
+                bs = bs4.BeautifulSoup(content.text, "html.parser")
+
+                list_array = bs.find('ul', 'feed')
+
+                if list_array != None:
+                    for link in list_array.select('article'):
+                        tmp = {}
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('h2').get_text().strip()
+                        tmp['kanal'] = lk['kanal']
+                        tmp['title_sub'] = ''
+                        title_sub = link.find('span', 'sub_judul')
+                        if title_sub != None:
+                            tmp['title_sub'] = title_sub.get_text().strip()
+
+                        # date
+                        date = link.find('span', 'date').get_text().strip()
+                        date = self.date_format_en(date)
+
+                        tmp['date'] = date
+                        news_link.append(tmp)
+
+                content.close()
+                bs.decompose()
+
+            if lk['kanal'] == 'detikTravel':
+                content = requests.get(lk['link'], timeout=10)
+                bs = bs4.BeautifulSoup(content.text, "html.parser")
+
+                list_array = bs.find('section', 'list__news')
+
+                if list_array != None:
+                    for link in list_array.select('article'):
+                        tmp = {}
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('h3').get_text().strip()
+                        tmp['kanal'] = lk['kanal']
+                        tmp['title_sub'] = ''
+                        title_sub = link.find('div', 'list__news__sub')
+                        if title_sub != None:
+                            tmp['title_sub'] = title_sub.get_text().strip()
+
+                        # date
+                        date = link.find('div', 'date').get_text().strip()
+                        date = self.date_format_en(date)
+
+                        tmp['date'] = date
+                        news_link.append(tmp)
+
+                content.close()
+                bs.decompose()
+
+            if lk['kanal'] == 'detikFood':
+                content = requests.get(lk['link'], timeout=10)
+                bs = bs4.BeautifulSoup(content.text, "html.parser")
+
+                list_array = bs.find('ul', 'feed')
+
+                if list_array != None:
+                    for link in list_array.select('article'):
+                        tmp = {}
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('h2').get_text().strip()
+                        tmp['kanal'] = lk['kanal']
+                        tmp['title_sub'] = ''
+                        title_sub = link.find('span', 'sub_judul')
+                        if title_sub != None:
+                            tmp['title_sub'] = title_sub.get_text().strip()
+
+                        # date
+                        date = link.find('span', 'date').get_text().strip()
+                        date = self.date_format_en(date)
+
+                        tmp['date'] = date
+                        news_link.append(tmp)
+
+                content.close()
+                bs.decompose()
+
+            if lk['kanal'] == 'detikHealth':
+                content = requests.get(lk['link'], timeout=10)
+                bs = bs4.BeautifulSoup(content.text, "html.parser")
+
+                list_array = bs.find('ul', 'list')
+
+                if list_array != None:
+                    for link in list_array.select('article'):
+                        tmp = {}
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('h2').get_text().strip()
+                        tmp['kanal'] = lk['kanal']
+                        tmp['title_sub'] = ''
+                        title_sub = link.find('span', 'sub_judul')
+                        if title_sub != None:
+                            tmp['title_sub'] = title_sub.get_text().strip()
+
+                        # date
+                        date = link.find('span', 'date').get_text().strip()
+                        date = self.date_format_en(date)
+
+                        tmp['date'] = date
+                        news_link.append(tmp)
+
+                content.close()
+                bs.decompose()
+
+            if lk['kanal'] == 'detikOto':
+                content = requests.get(lk['link'], timeout=10)
+                bs = bs4.BeautifulSoup(content.text, "html.parser")
+
+                list_array = bs.find('div', 'lf_content')
+
+                if list_array != None:
+                    for link in list_array.select('article'):
+                        tmp = {}
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('h2').get_text().strip()
+                        tmp['kanal'] = lk['kanal']
+                        tmp['title_sub'] = ''
+                        title_sub = link.find('span', 'sub_judul')
+                        if title_sub != None:
+                            tmp['title_sub'] = title_sub.get_text().strip()
+
+                        # date
+                        date = link.find('span', 'labdate').get_text().strip()
+                        date = self.date_format_en(date)
+
+                        tmp['date'] = date
+                        news_link.append(tmp)
+
+                content.close()
+                bs.decompose()
 
         return news_link
 
@@ -101,10 +266,11 @@ class DetikCrawler:
             slug = cat_option['href']
             slug = slug.replace("https://", '')
             slug = slug.replace("//", "")
+            slug_array = slug.split('?')
 
             tmp = {}
             tmp['title'] = title
-            tmp['slug'] = slug
+            tmp['slug'] = slug_array[0]
             categories.append(tmp)
 
         return categories
@@ -142,7 +308,7 @@ class DetikCrawler:
             'September',
             'Oktober',
             'November',
-            'December'
+            'Desember'
         ]
 
         month = 0
@@ -151,3 +317,32 @@ class DetikCrawler:
                 month = months.index(m)
 
         return '%s-%s-%s %s' %(date_array[3], month, date_array[1], time)
+
+    def date_format_en(self, date):
+        d = date.split(',')
+        date_time = d[1].replace('WIB', '').strip()
+
+        date_time_array = date_time.split(' ')
+
+        months = [
+            'bulan',
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'Mei',
+            'Jun',
+            'Jul',
+            'Agu',
+            'Sep',
+            'Okt',
+            'Nov',
+            'Des'
+        ]
+
+        month = 0
+        for m in months:
+            if date_time_array[1] == m:
+                month = months.index(m)
+
+        return '%s-%s-%s %s' % (date_time_array[2], month, date_time_array[0], date_time_array[3])

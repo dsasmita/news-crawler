@@ -13,6 +13,7 @@ class NewsPost(db_crawler.Model):
     kanal_index = Column(Text)
     scrap_status = Column(Boolean, default=False)
     title = Column(Text)
+    title_sub = Column(Text)
     content = Column(Text)
     tags = Column(Text)
     category = Column(Text)
