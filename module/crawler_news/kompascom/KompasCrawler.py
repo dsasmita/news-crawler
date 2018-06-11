@@ -36,25 +36,43 @@ class KompasCrawler:
                 for url in url_pagination:
                     content = requests.get(url, timeout=10)
                     response = bs4.BeautifulSoup(content.text, "html.parser")
-                    list_link = response.find_all('a', 'article__link')
+                    list_link = response.find_all('div', 'article__list')
 
                     for link in list_link:
                         tmp = {}
-                        tmp['href'] = link['href']
-                        tmp['title'] = link.get_text()
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('a','article__link').get_text().strip()
                         tmp['kanal'] = lk['kanal']
+
+                        date = link.find('div','article__date').get_text().strip()
+                        tmp['date'] = self.date_format_id(date)
                         news_link.append(tmp)
+
+                    content.close()
+                    response.decompose()
             else:
-                content = requests.get(lk['link'], timeout=10)
+                if lk['kanal'] == 'headline':
+                    link_request = lk['link_ori']
+                else:
+                    link_request = lk['link']
+
+                content = requests.get(link_request, timeout=10)
                 response = bs4.BeautifulSoup(content.text, "html.parser")
-                list_link = response.find_all('a', 'article__link')
+                list_link = response.find_all('div', 'article__list')
 
                 for link in list_link:
                     tmp = {}
-                    tmp['href'] = link['href']
-                    tmp['title'] = link.get_text()
+                    tmp['href'] = link.find('a')['href']
+                    tmp['title'] = link.find('a', 'article__link').get_text().strip()
                     tmp['kanal'] = lk['kanal']
+
+                    date = link.find('div', 'article__date').get_text().strip()
+                    tmp['date'] = self.date_format_id(date)
                     news_link.append(tmp)
+
+                content.close()
+                response.decompose()
+
         return news_link
 
     def generate_content_all_news(self):
@@ -79,6 +97,9 @@ class KompasCrawler:
         for cat_option in categories_container.select('option'):
             if(cat_option['value'] != 'topik-pilihan'):
                 categories.append(cat_option['value'])
+
+        content.close()
+        response.decompose()
 
         return categories
 
@@ -226,4 +247,14 @@ class KompasCrawler:
         news['created_at'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
         news['updated_at'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 
+        content.close()
+        response.decompose()
+
         return news
+
+    def date_format_id(self, date):
+        date_time_array = date.split(',')
+        time = date_time_array[1].replace('WIB', '').strip()
+        date_array = date_time_array[0].split('/')
+
+        return '%s-%s-%s %s' %(date_array[2], date_array[1], date_array[0], time)

@@ -21,8 +21,8 @@ with app.app_context():
     # detik
     portal = Portal()
     portal.title = 'detik.com'
-    portal.home_page = 'https://www.kompas.com'
-    portal.link_index = 'https://indeks.kompas.com/'
+    portal.home_page = 'https://www.detik.com/'
+    portal.link_index = 'https://news.detik.com/indeks'
 
     db_crawler.session.add(portal)
     db_crawler.session.commit()
