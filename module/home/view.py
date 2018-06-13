@@ -1,8 +1,9 @@
-from flask import render_template, Blueprint
+from flask import Blueprint, jsonify
 
 module_home = Blueprint('module_home', __name__, template_folder='templates')
 
 
 @module_home.route('/')
 def index():
-    return 'home index'
+    data = {'page': 'crawler', 'title': 'home crawler'}
+    return jsonify(data)

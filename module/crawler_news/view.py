@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 
 from module.crawler_news.detikcom.DetikCrawler import DetikCrawler
 from module.crawler_news.kompascom.KompasCrawler import KompasCrawler
@@ -11,7 +11,8 @@ module_crawler_news = Blueprint('module_scrap_news', __name__, template_folder='
 
 @module_crawler_news.route('/')
 def index():
-    return 'This is landing for crawler'
+    data = {'page': 'crawler', 'title': 'home crawler'}
+    return jsonify(data)
 
 
 # kompas
@@ -20,7 +21,8 @@ def kompas_list():
     date_scrap = request.args.get('date', datetime.datetime.now().strftime('%Y-%m-%d'))
 
     print('start ....')
-    print(datetime.datetime.now())
+    start_time = datetime.datetime.now()
+    print(start_time)
     print('......')
     print('......')
     print('......')
@@ -63,8 +65,17 @@ def kompas_list():
                 db_crawler.session.commit()
 
     print('Done')
-    print(datetime.datetime.now())
-    return str(len(link_news)) + ' news list post scrap from kompas.com'
+    end_time = datetime.datetime.now()
+    print(end_time)
+
+    data = {
+            'page' : 'crawler.kompas.list',
+            'title' : 'crawl kompas list',
+            'count' : len(link_news),
+            'start' : start_time,
+            'end' : end_time
+    }
+    return jsonify(data)
 
 
 @module_crawler_news.route('/kompas/category-insert')
@@ -106,7 +117,8 @@ def kompas_detail():
     limit = request.args.get('limit', 20)
 
     print('start ....')
-    print(datetime.datetime.now())
+    start_time = datetime.datetime.now()
+    print(start_time)
     print('......')
     print('......')
     print('......')
@@ -161,10 +173,19 @@ def kompas_detail():
 
         i = i + 1
 
+    end_time = datetime.datetime.now()
+    print(end_time)
     print(str(i) + ' news scarp')
     print('done ....')
-    print(datetime.datetime.now())
-    return str(i) + ' news scarp'
+
+    data = {
+            'page': 'crawler.kompas.detail',
+            'title': 'crawl kompas detail',
+            'count': i,
+            'start': start_time,
+            'end': end_time
+    }
+    return jsonify(data)
 
 # Detik
 @module_crawler_news.route('/detik/list')
@@ -172,7 +193,8 @@ def detik_scrap_list():
     date_scrap = request.args.get('date', datetime.datetime.now().strftime('%d/%m/%Y'))
 
     print('start ....')
-    print(datetime.datetime.now())
+    start_time = datetime.datetime.now()
+    print(start_time)
     print('......')
     print('......')
     print('......')
@@ -221,8 +243,12 @@ def detik_scrap_list():
                 db_crawler.session.commit()
 
     print('Done')
-    print(datetime.datetime.now())
-    return str(len(link_news)) + ' news list post scrap from detik.com'
+    end_time = datetime.datetime.now()
+    print(end_time)
+
+    data = {'page': 'crawler.kompas.list', 'title': 'crawl kompas list', 'count': len(link_news), 'start': start_time,
+        'end': end_time}
+    return jsonify(data)
 
 @module_crawler_news.route('/detik/category-insert')
 def detik_category_insert():
