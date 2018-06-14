@@ -124,7 +124,7 @@ def kompas_detail():
     print('......')
 
     news_posts = NewsPost.query.filter_by(scrap_status=False, id_portal=portal.id ).\
-                    order_by(NewsPost.id.asc()).limit(limit).all()
+                    order_by(NewsPost.date_publish.desc()).limit(limit).all()
 
     kompas = KompasCrawler()
 
