@@ -79,7 +79,6 @@ class KompasCrawler:
         news_list_link = self.generate_link()
         news = []
         for link in news_list_link:
-            print(link)
             news.append(self.scarp_detail_news(link))
 
         return news
@@ -142,7 +141,6 @@ class KompasCrawler:
             news['tags'] = ''
 
         # category
-        tmp_category_array = []
         try:
             categories = response.find('ul', 'breadcrumb__wrap')
             tmp_category_array = []

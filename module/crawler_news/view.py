@@ -77,7 +77,6 @@ def kompas_list():
     }
     return jsonify(data)
 
-
 @module_crawler_news.route('/kompas/category-insert')
 def kompas_category():
     check_kompas = Portal.query.filter_by(title='kompas.com').count()
@@ -104,7 +103,6 @@ def kompas_category():
             db_crawler.session.commit()
 
     return 'Kompas: category inserted'
-
 
 @module_crawler_news.route('kompas/detail')
 def kompas_detail():
@@ -276,3 +274,31 @@ def detik_category_insert():
             db_crawler.session.commit()
 
     return 'Detik: category inserted'
+
+@module_crawler_news.route('/detik/detail')
+def detik_detail():
+    check = Portal.query.filter_by(title='detik.com').count()
+    if check == 0:
+        return 'news portal detik not added yet'
+
+    print('start ....')
+    start_time = datetime.datetime.now()
+    print(start_time)
+    print('......')
+    print('......')
+    print('......')
+
+    # portal = Portal.query.filter_by(title='detik.com').first()
+
+    detik = DetikCrawler()
+    # link = 'https://news.detik.com/berita/d-4069805/zulkifli-usul-kalender-hijriah-agar-tak-ada-debat-kapan-lebaran'
+    link = 'https://news.detik.com/internasional/d-4069894/pemimpin-taliban-mullah-fazlullah-tewas-di-afghanistan'
+    result = detik.scarp_detail_news(link)
+
+    print(result)
+
+    print('Done')
+    end_time = datetime.datetime.now()
+    print(end_time)
+
+    return 'detail'
