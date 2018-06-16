@@ -1,6 +1,7 @@
 import datetime
 
 from flask import Blueprint, request, jsonify
+from sqlalchemy.sql.elements import Null
 
 from module.crawler_news.detikcom.DetikCrawler import DetikCrawler
 from module.crawler_news.kompascom.KompasCrawler import KompasCrawler
@@ -226,8 +227,8 @@ def detik_scrap_list():
             news = NewsPost()
             news.link_news = link['href']
             news.id_portal = portal.id
-            news.title = link['title']
-            news.title_sub = link['title_sub']
+            news.title = '%s' %link['title']
+            news.title_sub = '%s' %link['title_sub']
             news.kanal_index = link['kanal']
             news.date_publish = link['date']
 
@@ -275,8 +276,8 @@ def detik_category_insert():
 
     return 'Detik: category inserted'
 
-@module_crawler_news.route('/detik/detail')
-def detik_detail():
+@module_crawler_news.route('/detik/detail/singlepagenews')
+def detik_detail_singlepagenews():
     check = Portal.query.filter_by(title='detik.com').count()
     if check == 0:
         return 'news portal detik not added yet'
@@ -288,17 +289,97 @@ def detik_detail():
     print('......')
     print('......')
 
-    # portal = Portal.query.filter_by(title='detik.com').first()
+    portal = Portal.query.filter_by(title='detik.com').first()
+
+    limit = request.args.get('limit', 20)
+
+    news_posts = NewsPost.query.filter_by(scrap_status=False, meta_content_type='singlepagenews', id_portal=portal.id). \
+        order_by(NewsPost.date_publish.desc()).limit(limit).all()
 
     detik = DetikCrawler()
-    # link = 'https://news.detik.com/berita/d-4069805/zulkifli-usul-kalender-hijriah-agar-tak-ada-debat-kapan-lebaran'
-    link = 'https://news.detik.com/internasional/d-4069894/pemimpin-taliban-mullah-fazlullah-tewas-di-afghanistan'
-    result = detik.scarp_detail_news(link)
 
-    print(result)
+    i = 0
+    for news in news_posts:
+        content = detik.scarp_detail_news(news.link_news)
 
-    print('Done')
+        print(str(i + 1) + ': ' + str(datetime.datetime.now()))
+        print(news.link_news)
+
+        news.scrap_status = True
+
+        if content['title'] != '':
+            news.title = content['title']
+
+        news.content = '%s' %content['content']
+        news.tags = '%s' %content['tags']
+        news.category = '%s' %content['category']
+        news.category_sub = '%s' %content['category_sub']
+
+        news.image_link = '%s' %content['image_link']
+        news.image_link_alt = '%s' %content['image_link_alt']
+        news.author = '%s' %content['author']
+        news.meta_description = '%s' %content['meta_description']
+        news.meta_keyword = '%s' %content['meta_keyword']
+        news.meta_content_author = '%s' %content['meta_content_author']
+        news.meta_content_type = '%s' %content['meta_content_type']
+
+        db_crawler.session.add(news)
+        db_crawler.session.commit()
+
+        i = i + 1
+
+
     end_time = datetime.datetime.now()
     print(end_time)
+    print(str(i) + ' news scarp')
+    print('done ....')
 
-    return 'detail'
+    data = {'page': 'crawler.detik.detail', 'title': 'crawl detik detail', 'count': i, 'start': start_time,
+        'end': end_time}
+    return jsonify(data)
+
+@module_crawler_news.route('/detik/news-type')
+def detik_news_type():
+    check = Portal.query.filter_by(title='detik.com').count()
+    if check == 0:
+        return 'news portal detik not added yet'
+
+    print('start ....')
+    start_time = datetime.datetime.now()
+    print(start_time)
+    print('......')
+    print('......')
+    print('......')
+
+    portal = Portal.query.filter_by(title='detik.com').first()
+
+    limit = request.args.get('limit', 20)
+
+    news_posts = NewsPost.query.filter_by(meta_content_type=None, id_portal=portal.id). \
+        order_by(NewsPost.date_publish.desc()).limit(limit).all()
+
+    detik = DetikCrawler()
+
+    i = 0
+    for news in news_posts:
+        content = detik.scarp_news_type(news.link_news)
+
+        news.meta_description = '%s' %content['meta_description']
+        news.meta_keyword = '%s' %content['meta_keyword']
+        news.meta_content_author = '%s' %content['meta_content_author']
+        news.meta_content_type = '%s' %content['meta_content_type']
+
+        db_crawler.session.add(news)
+        db_crawler.session.commit()
+
+        i = i + 1
+
+
+    end_time = datetime.datetime.now()
+    print(end_time)
+    print(str(i) + ' news scarp')
+    print('done ....')
+
+    data = {'page': 'crawler.detik.news.type', 'title': 'crawl detik news type', 'count': i, 'start': start_time,
+        'end': end_time}
+    return jsonify(data)

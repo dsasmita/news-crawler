@@ -259,123 +259,135 @@ class DetikCrawler:
 
         news = {}
 
-        # title
-        try:
-            title_container = response.find('div', 'jdl')
-            news["title"] = title_container.select_one('h1').get_text()
-            news["title_sub"] = title_container.select_one('h2').get_text()
-        except:
-            news["title"] = ''
-            news["title_sub"] = ''
+        # meta data
+        metas = response.find_all('meta')
+        news['meta_description'] = ''
+        news['meta_keyword'] = ''
+        news['meta_content_author'] = ''
+        news['meta_content_type'] = ''
 
-        author_container = response.find('div', 'author')
-        try:
-            author_array = author_container.get_text().split('-')
-            news['author'] = author_array[0].strip()
-        except:
-            news['author'] = 'empty'
+        for meta in metas:
+            if 'name' in meta.attrs:
+                if meta.attrs['name'] == 'description':
+                    news['meta_description'] = meta.attrs['content']
+                elif meta.attrs['name'] == 'keywords':
+                    news['meta_keyword'] = meta.attrs['content']
+                elif meta.attrs['name'] == 'author':
+                    news['meta_content_author'] = meta.attrs['content']
+                elif meta.attrs['name'] == 'contenttype':
+                    news['meta_content_type'] = meta.attrs['content']
 
-        # tags
-        try:
-            tags = response.find('div', 'detail_tag')
-            tmp_tags_array = []
-            for tag in tags.select('a'):
-                tmp_tags_array.append(tag.get_text().strip())
+        if news['meta_content_type'] == 'singlepagenews':
+            # title
+            try:
+                title_container = response.find('div', 'jdl')
+                news["title"] = title_container.select_one('h1').get_text()
+                news["title_sub"] = title_container.select_one('h2').get_text()
+            except:
+                news["title"] = ''
+                news["title_sub"] = ''
 
-            news['tags'] = ', '.join(tmp_tags_array)
-        except:
-            news['tags'] = ''
+            author_container = response.find('div', 'author')
+            try:
+                author_array = author_container.get_text().split('-')
+                news['author'] = author_array[0].strip()
+            except:
+                news['author'] = 'empty'
 
-        # image_link
-        try:
-            photos = response.find('div','pic_artikel')
-            news['image_link'] = photos.img['src']
-            news['image_link_alt'] = photos.img['alt']
-        except:
-            news['image_link'] = ''
-            news['image_link_alt'] = ''
+            # tags
+            try:
+                tags = response.find('div', 'detail_tag')
+                tmp_tags_array = []
+                for tag in tags.select('a'):
+                    tmp_tags_array.append(tag.get_text().strip())
 
-        # content
-        try:
-            contents_container = response.find('div', {"id": "detikdetailtext"})
+                news['tags'] = ', '.join(tmp_tags_array)
+            except:
+                news['tags'] = ''
 
-            for script_tag in contents_container.find_all('script'):
-                script_tag.extract()
+            # image_link
+            try:
+                photos = response.find('div','pic_artikel')
+                news['image_link'] = photos.img['src']
+                news['image_link_alt'] = photos.img['alt']
+            except:
+                news['image_link'] = ''
+                news['image_link_alt'] = ''
 
-            for comment_tag in contents_container.find_all(text=lambda text:isinstance(text, Comment)):
-                comment_tag.extract()
+            # content
+            try:
+                contents_container = response.find('div', {"id": "detikdetailtext"})
 
-            for table_tag in contents_container.find_all('table'):
-                table_tag.extract()
+                for script_tag in contents_container.find_all('script'):
+                    script_tag.extract()
 
-            for center_tag in contents_container.find_all('center'):
-                center_tag.extract()
+                for comment_tag in contents_container.find_all(text=lambda text:isinstance(text, Comment)):
+                    comment_tag.extract()
 
-            for div_tag in contents_container.find_all('div'):
-                div_tag.extract()
+                for table_tag in contents_container.find_all('table'):
+                    table_tag.extract()
 
-            news["content"] = contents_container
-        except:
-            news["content"] = ''
+                for center_tag in contents_container.find_all('center'):
+                    center_tag.extract()
 
-        # category
-        try:
-            categories = response.find('div', 'breadcrumb')
-            tmp_category_array = []
-            for category in categories.select("a"):
-                if category.get_text().strip() != 'Detail Berita':
-                    tmp_category_array.append(category.get_text().strip())
-        except:
-            tmp_category_array = []
+                for div_tag in contents_container.find_all('div'):
+                    div_tag.extract()
 
-        try:
-            news['category'] = tmp_category_array[0]
-        except:
-            news['category'] = 'empty'
+                news["content"] = contents_container
+            except:
+                news["content"] = ''
 
-        try:
-            news['category_sub'] = tmp_category_array[1]
-        except:
-            news['category_sub'] = 'empty'
+            # category
+            try:
+                categories = response.find('div', 'breadcrumb')
+                tmp_category_array = []
+                for category in categories.select("a"):
+                    if category.get_text().strip() != 'Detail Berita':
+                        tmp_category_array.append(category.get_text().strip())
+            except:
+                tmp_category_array = []
 
+            try:
+                news['category'] = tmp_category_array[0]
+            except:
+                news['category'] = 'empty'
+
+            try:
+                news['category_sub'] = tmp_category_array[1]
+            except:
+                news['category_sub'] = 'empty'
+
+            news['created_at'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+            news['updated_at'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+
+        content.close()
+        response.decompose()
+
+        return news
+
+    def scarp_news_type(self, news_link):
+        content = requests.get(news_link, timeout=10)
+        response = bs4.BeautifulSoup(content.text, "html.parser")
+
+        news = {}
 
         # meta data
         metas = response.find_all('meta')
-        print(metas)
+        news['meta_description'] = ''
+        news['meta_keyword'] = ''
+        news['meta_content_author'] = ''
+        news['meta_content_type'] = ''
 
-        # for meta in metas:
-        #     if 'name' in meta.attrs:
-        #         if meta.attrs['name'] == 'description':
-        #             news['meta_description'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'keywords':
-        #             news['meta_keyword'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_category':
-        #             news['meta_content_category'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_subcategory':
-        #             news['meta_content_category_sub'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_location':
-        #             news['meta_content_location'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_author':
-        #             news['meta_content_author'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_editor':
-        #             news['meta_content_editor'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_lipsus':
-        #             news['meta_content_lipsus'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_type':
-        #             news['meta_content_type'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_publish_date':
-        #             news['meta_content_publish_date'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_source':
-        #             news['meta_content_source'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_tag':
-        #             news['meta_content_tag'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_total_words':
-        #             news['meta_content_total_words'] = meta.attrs['content']
-        #         elif meta.attrs['name'] == 'content_PublishedDate':
-        #             news['meta_content_publish_date'] = meta.attrs['content']
-
-        news['created_at'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-        news['updated_at'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+        for meta in metas:
+            if 'name' in meta.attrs:
+                if meta.attrs['name'] == 'description':
+                    news['meta_description'] = meta.attrs['content']
+                elif meta.attrs['name'] == 'keywords':
+                    news['meta_keyword'] = meta.attrs['content']
+                elif meta.attrs['name'] == 'author':
+                    news['meta_content_author'] = meta.attrs['content']
+                elif meta.attrs['name'] == 'contenttype':
+                    news['meta_content_type'] = meta.attrs['content']
 
         content.close()
         response.decompose()
