@@ -7,6 +7,14 @@ from bs4 import Comment
 
 
 class DetikCrawler:
+    HEADERS = {
+        'Accept-Encoding': 'gzip, '
+        'deflate, sdch', 'Accept-Language': 'en-US,en;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Cache-Control': 'max-age=0', 'Connection': 'keep-alive'}
+
     def __init__(self):
         self.id_news = 0  # id news
         self.link_index = ''  # indeks link
@@ -19,7 +27,7 @@ class DetikCrawler:
         url_pagination = []
 
         if (link_list['type'] == 'GET'):
-            content = requests.get(link_list['link'], timeout=10)
+            content = requests.get(link_list['link'], timeout=10, headers=DetikCrawler.HEADERS)
             bs = bs4.BeautifulSoup(content.text, "html.parser")
 
             pagination = bs.find('div', 'paging')
@@ -61,7 +69,7 @@ class DetikCrawler:
             if lk['kanal'] == 'detikNews':
                 url_pagination = self.generate_index(lk)
                 for url in url_pagination:
-                    content = requests.get(url['link'], timeout=10)
+                    content = requests.get(url['link'], timeout=10, headers=DetikCrawler.HEADERS)
                     bs = bs4.BeautifulSoup(content.text, "html.parser")
                     list_array = bs.find("ul", {"id": "indeks-container"})
 
@@ -87,7 +95,7 @@ class DetikCrawler:
                     bs.decompose()
 
             if lk['kanal'] == 'detikFinance':
-                content = requests.get(lk['link'], timeout=10)
+                content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
                 list_array = bs.find('div', 'lf_content')
@@ -114,7 +122,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detiki-Net':
-                content = requests.get(lk['link'], timeout=10)
+                content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
                 list_array = bs.find('ul', 'feed')
@@ -141,7 +149,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikTravel':
-                content = requests.get(lk['link'], timeout=10)
+                content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
                 list_array = bs.find('section', 'list__news')
@@ -168,7 +176,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikFood':
-                content = requests.get(lk['link'], timeout=10)
+                content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
                 list_array = bs.find('ul', 'feed')
@@ -195,7 +203,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikHealth':
-                content = requests.get(lk['link'], timeout=10)
+                content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
                 list_array = bs.find('ul', 'list')
@@ -222,7 +230,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikOto':
-                content = requests.get(lk['link'], timeout=10)
+                content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
                 list_array = bs.find('div', 'lf_content')
@@ -254,7 +262,7 @@ class DetikCrawler:
         return 'list'
 
     def scarp_detail_news(self, news_link):
-        content = requests.get(news_link, timeout=10)
+        content = requests.get(news_link, timeout=10, headers=DetikCrawler.HEADERS)
         response = bs4.BeautifulSoup(content.text, "html.parser")
 
         news = {}
@@ -366,7 +374,7 @@ class DetikCrawler:
         return news
 
     def scarp_news_type(self, news_link):
-        content = requests.get(news_link, timeout=10)
+        content = requests.get(news_link, timeout=10, headers=DetikCrawler.HEADERS)
         response = bs4.BeautifulSoup(content.text, "html.parser")
 
         news = {}
@@ -400,7 +408,7 @@ class DetikCrawler:
         if link_index == '':
             return categories
 
-        content = requests.get(link_index, timeout=10)
+        content = requests.get(link_index, timeout=10, headers=DetikCrawler.HEADERS)
         response = bs4.BeautifulSoup(content.text, "html.parser")
 
         categories_container = response.find('div', 'menu_idx')

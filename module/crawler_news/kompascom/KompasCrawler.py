@@ -3,6 +3,16 @@ import bs4
 import requests
 
 class KompasCrawler:
+    HEADERS = {
+        'Accept-Encoding': 'gzip, '
+        'deflate, sdch', 'Accept-Language': 'en-US,en;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Cache-Control': 'max-age=0',
+        'Connection': 'keep-alive'
+    }
+
     def __init__(self):
         self.id_news = 0 # id news
         self.link_index = '' # indeks link
@@ -12,7 +22,7 @@ class KompasCrawler:
         if link_list == '':
             return 'link_list not specified'
 
-        content = requests.get(link_list, timeout=10)
+        content = requests.get(link_list, timeout=10, headers=KompasCrawler.HEADERS)
         bs = bs4.BeautifulSoup(content.text, "html.parser")
 
         index = [item['data-ci-pagination-page']
@@ -34,7 +44,7 @@ class KompasCrawler:
 
             if len(url_pagination) > 0:
                 for url in url_pagination:
-                    content = requests.get(url, timeout=10)
+                    content = requests.get(url, timeout=10, headers=KompasCrawler.HEADERS)
                     response = bs4.BeautifulSoup(content.text, "html.parser")
                     list_link = response.find_all('div', 'article__list')
 
@@ -56,7 +66,7 @@ class KompasCrawler:
                 else:
                     link_request = lk['link']
 
-                content = requests.get(link_request, timeout=10)
+                content = requests.get(link_request, timeout=10, headers=KompasCrawler.HEADERS)
                 response = bs4.BeautifulSoup(content.text, "html.parser")
                 list_link = response.find_all('div', 'article__list')
 
@@ -89,7 +99,7 @@ class KompasCrawler:
         if link_index == '':
             return categories
 
-        content = requests.get(link_index, timeout=10)
+        content = requests.get(link_index, timeout=10, headers=KompasCrawler.HEADERS)
         response = bs4.BeautifulSoup(content.text, "html.parser")
 
         categories_container = response.find('div','form__select__wrap')
@@ -103,7 +113,7 @@ class KompasCrawler:
         return categories
 
     def scarp_detail_news(self, news_link):
-        content = requests.get(news_link, timeout=10)
+        content = requests.get(news_link, timeout=10, headers=KompasCrawler.HEADERS)
         response = bs4.BeautifulSoup(content.text, "html.parser")
 
         news = {}
