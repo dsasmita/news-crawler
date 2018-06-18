@@ -134,43 +134,47 @@ def kompas_detail():
         content = kompas.scarp_detail_news(news.link_news)
         news.scrap_status = True
 
-        if content['title'] != '':
-            news.title = content['title']
+        if content == False:
+            db_crawler.session.add(news)
+            db_crawler.session.commit()
+        else:
+            if content['title'] != '':
+                news.title = content['title']
 
-        news.content = content['content']
-        news.tags = content['tags']
-        news.category = content['category']
-        news.category_sub = content['category_sub']
+            news.content = content['content']
+            news.tags = content['tags']
+            news.category = content['category']
+            news.category_sub = content['category_sub']
 
-        if content['date_publish'] != '':
-            news.date_publish = content['date_publish']
+            if content['date_publish'] != '':
+                news.date_publish = content['date_publish']
 
-        news.image_link = content['image_link']
-        news.image_link_alt = content['image_link_alt']
-        news.author = content['author']
-        news.editor = content['editor']
-        news.source = content['meta_content_source']
-        news.meta_description = content['meta_description']
-        news.meta_keyword = content['meta_keyword']
-        news.meta_content_category = content['meta_content_category']
-        news.meta_content_category_sub = content['meta_content_category_sub']
-        news.meta_content_location = content['meta_content_location']
-        news.meta_content_author = content['meta_content_author']
-        news.meta_content_editor = content['meta_content_editor']
-        news.meta_content_lipsus = content['meta_content_lipsus']
-        news.meta_content_type = content['meta_content_type']
+            news.image_link = content['image_link']
+            news.image_link_alt = content['image_link_alt']
+            news.author = content['author']
+            news.editor = content['editor']
+            news.source = content['meta_content_source']
+            news.meta_description = content['meta_description']
+            news.meta_keyword = content['meta_keyword']
+            news.meta_content_category = content['meta_content_category']
+            news.meta_content_category_sub = content['meta_content_category_sub']
+            news.meta_content_location = content['meta_content_location']
+            news.meta_content_author = content['meta_content_author']
+            news.meta_content_editor = content['meta_content_editor']
+            news.meta_content_lipsus = content['meta_content_lipsus']
+            news.meta_content_type = content['meta_content_type']
 
-        if content['meta_content_publish_date'] != '':
-            news.meta_content_publish_date = content['meta_content_publish_date']
+            if content['meta_content_publish_date'] != '':
+                news.meta_content_publish_date = content['meta_content_publish_date']
 
-        news.meta_content_source = content['meta_content_source']
-        news.meta_content_total_words = content['meta_content_total_words']
-        news.meta_content_total_words = content['meta_content_total_words']
+            news.meta_content_source = content['meta_content_source']
+            news.meta_content_total_words = content['meta_content_total_words']
+            news.meta_content_total_words = content['meta_content_total_words']
 
-        db_crawler.session.add(news)
-        db_crawler.session.commit()
+            db_crawler.session.add(news)
+            db_crawler.session.commit()
 
-        i = i + 1
+            i = i + 1
 
     end_time = datetime.datetime.now()
     print(end_time)
