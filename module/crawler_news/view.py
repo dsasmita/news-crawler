@@ -193,7 +193,7 @@ def kompas_detail():
 # Detik
 @module_crawler_news.route('/detik/list')
 def detik_scrap_list():
-    date_scrap = request.args.get('date', datetime.datetime.now().strftime('%d/%m/%Y'))
+    date_scrap = request.args.get('date', datetime.datetime.now().strftime('%m/%d/%Y'))
 
     print('start ....')
     start_time = datetime.datetime.now()
@@ -249,7 +249,7 @@ def detik_scrap_list():
     end_time = datetime.datetime.now()
     print(end_time)
 
-    data = {'page': 'crawler.kompas.list', 'title': 'crawl kompas list', 'count': len(link_news), 'start': start_time,
+    data = {'page': 'crawler.detik.list', 'title': 'crawl detik list', 'count': len(link_news), 'start': start_time,
         'end': end_time}
     return jsonify(data)
 

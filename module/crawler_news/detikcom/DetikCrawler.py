@@ -69,6 +69,7 @@ class DetikCrawler:
             if lk['kanal'] == 'detikNews':
                 url_pagination = self.generate_index(lk)
                 for url in url_pagination:
+                    print(url['link'])
                     content = requests.get(url['link'], timeout=10, headers=DetikCrawler.HEADERS)
                     bs = bs4.BeautifulSoup(content.text, "html.parser")
                     list_array = bs.find("ul", {"id": "indeks-container"})
@@ -95,6 +96,7 @@ class DetikCrawler:
                     bs.decompose()
 
             if lk['kanal'] == 'detikFinance':
+                print(lk['link'])
                 content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
@@ -122,6 +124,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detiki-Net':
+                print(lk['link'])
                 content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
@@ -149,6 +152,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikTravel':
+                print(lk['link'])
                 content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
@@ -176,6 +180,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikFood':
+                print(lk['link'])
                 content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
@@ -203,6 +208,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikHealth':
+                print(lk['link'])
                 content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 
@@ -230,6 +236,7 @@ class DetikCrawler:
                 bs.decompose()
 
             if lk['kanal'] == 'detikOto':
+                print(lk['link'])
                 content = requests.get(lk['link'], timeout=10, headers=DetikCrawler.HEADERS)
                 bs = bs4.BeautifulSoup(content.text, "html.parser")
 

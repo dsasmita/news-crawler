@@ -44,6 +44,7 @@ class KompasCrawler:
 
             if len(url_pagination) > 0:
                 for url in url_pagination:
+                    print(url)
                     content = requests.get(url, timeout=10, headers=KompasCrawler.HEADERS)
                     response = bs4.BeautifulSoup(content.text, "html.parser")
                     list_link = response.find_all('div', 'article__list')
@@ -66,6 +67,7 @@ class KompasCrawler:
                 else:
                     link_request = lk['link']
 
+                print(link_request)
                 content = requests.get(link_request, timeout=10, headers=KompasCrawler.HEADERS)
                 response = bs4.BeautifulSoup(content.text, "html.parser")
                 list_link = response.find_all('div', 'article__list')
