@@ -43,8 +43,8 @@ class KompasCrawler:
 
             if len(url_pagination) > 0:
                 for url in url_pagination:
-                    print(url)
                     try:
+                        print(url)
                         content = requests.get(url, timeout=10, headers=KompasCrawler.HEADERS)
                         response = bs4.BeautifulSoup(content.text, "html.parser")
                         list_link = response.find_all('div', 'article__list')
@@ -69,23 +69,26 @@ class KompasCrawler:
                 else:
                     link_request = lk['link']
 
-                print(link_request)
-                content = requests.get(link_request, timeout=10, headers=KompasCrawler.HEADERS)
-                response = bs4.BeautifulSoup(content.text, "html.parser")
-                list_link = response.find_all('div', 'article__list')
+                try:
+                    print(link_request)
+                    content = requests.get(link_request, timeout=10, headers=KompasCrawler.HEADERS)
+                    response = bs4.BeautifulSoup(content.text, "html.parser")
+                    list_link = response.find_all('div', 'article__list')
 
-                for link in list_link:
-                    tmp = {}
-                    tmp['href'] = link.find('a')['href']
-                    tmp['title'] = link.find('a', 'article__link').get_text().strip()
-                    tmp['kanal'] = lk['kanal']
+                    for link in list_link:
+                        tmp = {}
+                        tmp['href'] = link.find('a')['href']
+                        tmp['title'] = link.find('a', 'article__link').get_text().strip()
+                        tmp['kanal'] = lk['kanal']
 
-                    date = link.find('div', 'article__date').get_text().strip()
-                    tmp['date'] = self.date_format_id(date)
-                    news_link.append(tmp)
+                        date = link.find('div', 'article__date').get_text().strip()
+                        tmp['date'] = self.date_format_id(date)
+                        news_link.append(tmp)
 
-                content.close()
-                response.decompose()
+                    content.close()
+                    response.decompose()
+                except:
+                    print('error: ' + link_request)
 
         return news_link
 
