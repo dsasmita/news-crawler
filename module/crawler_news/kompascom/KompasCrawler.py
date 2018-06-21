@@ -1,4 +1,4 @@
-import datetime
+import time
 import bs4
 import requests
 
@@ -61,6 +61,8 @@ class KompasCrawler:
 
                     content.close()
                     response.decompose()
+
+                    time.sleep(5)
             else:
                 if lk['kanal'] == 'headline':
                     link_request = lk['link_ori']
