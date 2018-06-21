@@ -1,8 +1,6 @@
 import datetime
-import time
 
 from flask import Blueprint, request, jsonify
-from sqlalchemy.sql.elements import Null
 
 from module.crawler_news.detikcom.DetikCrawler import DetikCrawler
 from module.crawler_news.kompascom.KompasCrawler import KompasCrawler
@@ -177,8 +175,6 @@ def kompas_detail():
             db_crawler.session.commit()
 
             i = i + 1
-
-        time.sleep(5)
 
     end_time = datetime.datetime.now()
     print(end_time)
