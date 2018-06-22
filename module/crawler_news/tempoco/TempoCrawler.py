@@ -28,7 +28,26 @@ class TempoCrawler:
         return 'news'
 
     def get_kanal(self):
-        return 'gent_kanal'
+        link_index = self.link_index
+        categories = []
+        if link_index == '':
+            return categories
+
+        content = requests.get(link_index, timeout=10, headers=TempoCrawler.HEADERS)
+        response = bs4.BeautifulSoup(content.text, "html.parser")
+
+        categories_container = response.find('div', {'id': 'pilih-kanal'})
+        for cat_option in categories_container.select('option'):
+            if(cat_option['value'] != ''):
+                tmp = {}
+                tmp['slug'] = cat_option['value']
+                tmp['title'] = cat_option.get_text()
+                categories.append(tmp)
+
+        content.close()
+        response.decompose()
+
+        return categories
 
     def scarp_detail_news(self, news_link):
         return 'scrap_detail_news'

@@ -389,64 +389,29 @@ def detik_news_type():
     return jsonify(data)
 
 # Tempo
-@module_crawler_news.route('/tempo/list')
-def tempo_scrap_list():
-    date_scrap = request.args.get('date', datetime.datetime.now().strftime('%Y/%m/%d'))
-
-    print('start ....')
-    start_time = datetime.datetime.now()
-    print(start_time)
-    print('......')
-    print('......')
-    print('......')
-
+@module_crawler_news.route('/tempo/category-insert')
+def tempo_category_insert():
     check_kompas = Portal.query.filter_by(title='tempo.co').count()
     if check_kompas == 0:
         return 'news portal tempo not added yet'
 
     portal = Portal.query.filter_by(title='tempo.co').first()
-    kanals = Kanal.query.filter_by(id_portal=portal.id).all()
-
-    kanal_list = []
-    for kn in kanals:
-        link = kn.slug
-        link_array = link.split('?')
-        link = link_array[0]
-        tmp = {}
-        tmp['link'] = 'https://' + link + '?date=' + date_scrap
-        tmp['link_ori'] = 'https://' + link
-        tmp['kanal'] = kn.title
-        tmp['type'] = kn.type
-        tmp['date'] = date_scrap
-        kanal_list.append(tmp)
 
     tempo = TempoCrawler()
-    link_news = tempo.generate_link(kanal_list)
+    tempo.id_news = portal.id
+    tempo.link_index = portal.link_index
+    kanals = tempo.get_kanal()
 
-    for link in link_news:
-        check = NewsPost.query.filter_by(link_news=link['href']).count()
-        if check == 0:
-            news = NewsPost()
-            news.link_news = link['href']
-            news.id_portal = portal.id
-            news.title = '%s' %link['title']
-            news.title_sub = '%s' %link['title_sub']
-            news.kanal_index = link['kanal']
-            news.date_publish = link['date']
+    for kn in kanals:
+        check_category = Kanal.query.filter_by(slug=kn['slug']).count()
+        if check_category == 0:
+            kanal = Kanal()
+            kanal.id_portal = portal.id
+            kanal.title = kn['title']
+            kanal.slug = kn['slug']
+            kanal.description = kn['title']
 
-            db_crawler.session.add(news)
+            db_crawler.session.add(kanal)
             db_crawler.session.commit()
-        else:
-            news = NewsPost.query.filter_by(link_news=link['href']).first()
-            if link['kanal'] not in news.kanal_index:
-                news.kanal_index = news.kanal_index + ', ' + link['kanal']
-                db_crawler.session.add(news)
-                db_crawler.session.commit()
 
-    print('Done')
-    end_time = datetime.datetime.now()
-    print(end_time)
-
-    data = {'page': 'crawler.detik.list', 'title': 'crawl detik list', 'count': len(link_news), 'start': start_time,
-        'end': end_time}
-    return jsonify(data)
+    return 'Tempo: category inserted'
