@@ -415,3 +415,64 @@ def tempo_category_insert():
             db_crawler.session.commit()
 
     return 'Tempo: category inserted'
+
+@module_crawler_news.route('/tempo/list')
+def tempo_list():
+    date_scrap = request.args.get('date', datetime.datetime.now().strftime('%Y/%m/%d'))
+
+    print('start ....')
+    start_time = datetime.datetime.now()
+    print(start_time)
+    print('......')
+    print('......')
+    print('......')
+
+    check_kompas = Portal.query.filter_by(title='tempo.co').count()
+    if check_kompas == 0:
+        return 'news portal tempo not added yet'
+
+    portal = Portal.query.filter_by(title='tempo.co').first()
+    kanals = Kanal.query.filter_by(id_portal=portal.id).all()
+
+    kanal_list = []
+    for kn in kanals:
+        tmp = {}
+        tmp['link'] = 'https://www.tempo.co/indeks/' + date_scrap + '/' + kn.slug
+        tmp['kanal'] = kn.title
+        tmp['kanal_slug'] = kn.slug
+        kanal_list.append(tmp)
+
+    tempo = TempoCrawler()
+    link_news = tempo.generate_link(kanal_list)
+
+    for link in link_news:
+        check = NewsPost.query.filter_by(link_news=link['href']).count()
+        if check == 0:
+            news = NewsPost()
+            news.link_news = link['href']
+            news.id_portal = portal.id
+            news.title = link['title']
+            news.kanal_index = link['kanal']
+            news.date_publish = link['date']
+
+            db_crawler.session.add(news)
+            db_crawler.session.commit()
+        else:
+            news = NewsPost.query.filter_by(link_news=link['href']).first()
+            if link['kanal'] not in news.kanal_index:
+                news.kanal_index = news.kanal_index + ', ' + link['kanal']
+                db_crawler.session.add(news)
+                db_crawler.session.commit()
+
+    print('Done')
+    end_time = datetime.datetime.now()
+    print(end_time)
+
+    data = {
+            'page' : 'crawler.kompas.list',
+            'title' : 'crawl kompas list',
+            'count' : len(link_news),
+            'start' : start_time,
+            'end' : end_time
+    }
+    return jsonify(data)

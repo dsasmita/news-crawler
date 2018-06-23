@@ -22,7 +22,33 @@ class TempoCrawler:
         return 'generate_index'
 
     def generate_link(self, link_list):
-        return 'generate_link'
+        news_link = []
+        for lk in link_list:
+            link_request = lk['link']
+
+            try:
+                print(link_request)
+                content = requests.get(link_request, timeout=10, headers=TempoCrawler.HEADERS)
+                response = bs4.BeautifulSoup(content.text, "html.parser")
+                list_link = response.find('section', 'list-type-1')
+
+                print('test')
+
+                for link in list_link.select('li'):
+                    tmp = {}
+                    tmp['href'] = link.find('a')['href']
+                    tmp['title'] = link.find('h2', 'title').get_text().strip()
+                    tmp['kanal'] = lk['kanal_slug']
+                    date = link.find('span', 'col').get_text().strip()
+                    tmp['date'] = self.date_format_id(date)
+                    news_link.append(tmp)
+
+                content.close()
+                response.decompose()
+            except:
+                print('error: ' + link_request)
+
+        return news_link
 
     def generate_content_all_news(self):
         return 'news'
@@ -53,8 +79,28 @@ class TempoCrawler:
         return 'scrap_detail_news'
 
     def date_format_id(self, date):
-        date_time_array = date.split(',')
-        time = date_time_array[1].replace('WIB', '').strip()
-        date_array = date_time_array[0].split('/')
+        date = date.replace('WIB', '').strip()
+        date_array = date.split(' ')
 
-        return '%s-%s-%s %s' %(date_array[2], date_array[1], date_array[0], time)
+        months = [
+            'bulan',
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+        ]
+
+        month = 0
+        for m in months:
+            if date_array[1] == m:
+                month = months.index(m)
+
+        return '%s-%s-%s %s' %(date_array[2], month, date_array[0], date_array[3])
