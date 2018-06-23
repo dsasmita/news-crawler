@@ -469,8 +469,8 @@ def tempo_list():
     print(end_time)
 
     data = {
-            'page' : 'crawler.kompas.list',
-            'title' : 'crawl kompas list',
+            'page' : 'crawler.detik.list',
+            'title' : 'crawl detik list',
             'count' : len(link_news),
             'start' : start_time,
             'end' : end_time
