@@ -32,8 +32,6 @@ class TempoCrawler:
                 response = bs4.BeautifulSoup(content.text, "html.parser")
                 list_link = response.find('section', 'list-type-1')
 
-                print('test')
-
                 for link in list_link.select('li'):
                     tmp = {}
                     tmp['href'] = link.find('a')['href']
